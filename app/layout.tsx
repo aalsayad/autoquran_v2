@@ -1,15 +1,27 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Scheherazade_New, Noto_Naskh_Arabic } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
+import Navbar from "@/Components/Navbar/Navbar";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const scheherazade = Scheherazade_New({
+  weight: ["400", "700"],
+  subsets: ["arabic"],
+  variable: "--font-quran",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const notoNaskhArabic = Noto_Naskh_Arabic({
+  weight: ["400", "700"],
+  subsets: ["arabic"],
+  variable: "--font-quran2",
+  display: "swap",
+});
+
+const uthmanic = localFont({
+  src: "../public/font/uthmanic/KFGQPC HAFS Uthmanic Script.woff2",
+  variable: "--font-numbers",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -25,8 +37,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${scheherazade.variable} ${uthmanic.variable} ${notoNaskhArabic.variable} antialiased`}
       >
+        <Navbar />
         {children}
       </body>
     </html>
