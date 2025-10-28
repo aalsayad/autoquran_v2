@@ -3,7 +3,10 @@
 import MushafView from "@/Components/Quran/MushafView";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { MushafNavigationBar } from "@/Components/Navbar/MushafNavigationBar";
+import {
+  MushafNavigationBar,
+  ViewMode,
+} from "@/Components/Navbar/MushafNavigationBar";
 import { getChapterData } from "@/lib/quran-helper-functions/quranApi";
 import Navbar from "@/Components/Navbar/Navbar";
 
@@ -13,8 +16,34 @@ const MushafPage = () => {
   const chapter = searchParams.get("chapter");
   const [chapterNameArabic, setChapterNameArabic] = useState<string>("");
   const [chapterNameEnglish, setChapterNameEnglish] = useState<string>("");
+  const [viewMode, setViewMode] = useState<ViewMode>("page");
+  const [showTranslation, setShowTranslation] = useState<boolean>(false);
 
   const currentChapter = parseInt(chapter || "1");
+
+  // Load preferences from localStorage on mount
+  useEffect(() => {
+    const savedViewMode = localStorage.getItem("quran-view-mode") as ViewMode;
+    const savedShowTranslation = localStorage.getItem("quran-show-translation");
+
+    if (savedViewMode === "page" || savedViewMode === "list") {
+      setViewMode(savedViewMode);
+    }
+
+    if (savedShowTranslation !== null) {
+      setShowTranslation(savedShowTranslation === "true");
+    }
+  }, []);
+
+  // Save viewMode to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("quran-view-mode", viewMode);
+  }, [viewMode]);
+
+  // Save showTranslation to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("quran-show-translation", showTranslation.toString());
+  }, [showTranslation]);
 
   // Redirect to default if no chapter param
   useEffect(() => {
@@ -58,13 +87,21 @@ const MushafPage = () => {
             currentChapter={currentChapter}
             chapterNameArabic={chapterNameArabic}
             chapterNameEnglish={chapterNameEnglish}
+            viewMode={viewMode}
+            showTranslation={showTranslation}
             onNext={handleNext}
             onPrevious={handlePrevious}
+            onViewChange={setViewMode}
+            onToggleTranslation={() => setShowTranslation(!showTranslation)}
           />
         }
       />
 
-      <MushafView chapterNumber={currentChapter} />
+      <MushafView
+        chapterNumber={currentChapter}
+        viewMode={viewMode}
+        showTranslation={showTranslation}
+      />
     </>
   );
 };

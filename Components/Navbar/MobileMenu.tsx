@@ -19,11 +19,12 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     <>
       {/* Sliding Menu */}
       <div
-        className={`fixed top-16 left-0 right-0 z-60 md:hidden transition-transform duration-300 ease-out ${
+        className={`fixed bg-background top-16 left-0 right-0 md:hidden transition-transform duration-300 ease-out ${
           isOpen ? "translate-y-0" : "-translate-y-full"
         }`}
       >
-        <div className="bg-background border-b">
+        {/* Mobile Menu Content */}
+        <div className=" border-b">
           <div className="max-w-[1150px] mx-auto px-4 py-6 space-y-10">
             {/* Links Section */}
             <div className="">
@@ -75,11 +76,10 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           </div>
         </div>
       </div>
-
       {/* Backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/20 z-55 md:hidden"
+          className="fixed top-16 bottom-0 left-0 right-0 bg-black/20 z-[-1] md:hidden"
           onClick={onClose}
         />
       )}

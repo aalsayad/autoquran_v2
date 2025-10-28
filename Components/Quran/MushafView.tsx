@@ -4,10 +4,20 @@ import type { ChapterVerses } from "@/lib/types";
 import React, { useState, useEffect } from "react";
 import { getChapterVerses } from "@/lib/quran-helper-functions/quranApi";
 import QpcPage from "./QpcPage";
+import ListView from "./ListView";
 import { LoadingSkeleton } from "../ui/LoadingSkeleton";
 import { AyahNavigationBar } from "../Navbar/AyahNavigationBar";
+import type { ViewMode } from "../Navbar/MushafNavigationBar";
 
-const MushafView = ({ chapterNumber }: { chapterNumber: number }) => {
+const MushafView = ({
+  chapterNumber,
+  viewMode = "page",
+  showTranslation = false,
+}: {
+  chapterNumber: number;
+  viewMode?: ViewMode;
+  showTranslation?: boolean;
+}) => {
   const [chapterVerses, setChapterVerses] = useState<ChapterVerses | null>(
     null
   );
@@ -103,7 +113,7 @@ const MushafView = ({ chapterNumber }: { chapterNumber: number }) => {
         lang="ar"
         dir="rtl"
       >
-        <div className="max-w-[1150px] mx-auto">
+        <div className="max-w-[900px] mx-auto">
           {/* Header */}
           <div className="space-y-2">
             {/* Surah Name */}
@@ -122,23 +132,33 @@ const MushafView = ({ chapterNumber }: { chapterNumber: number }) => {
           {/* Divider */}
           <div className="h-px bg-foreground/10 w-full mt-8 mb-16"></div>
 
-          {/* Pages */}
-          {chapterVerses?.pages
-            .filter((p) => p.verses.length > 0) // Filter out empty pages
-            .map((p) => {
-              // Use the fetched page number for the key and rendering
-              const pageNum = p.fetchedPageNumber || p.verses[0]?.page_number;
-              if (!pageNum) return null;
-              return (
-                <QpcPage
-                  key={pageNum}
-                  pageNumber={pageNum}
-                  verses={p.verses}
-                  currentAyah={isNavigating ? currentAyah : undefined}
-                  onAyahClick={handleAyahClick}
-                />
-              );
-            })}
+          {/* Render based on view mode */}
+          {viewMode === "page" ? (
+            /* Page View */
+            chapterVerses?.pages
+              .filter((p) => p.verses.length > 0)
+              .map((p) => {
+                const pageNum = p.fetchedPageNumber || p.verses[0]?.page_number;
+                if (!pageNum) return null;
+                return (
+                  <QpcPage
+                    key={pageNum}
+                    pageNumber={pageNum}
+                    verses={p.verses}
+                    currentAyah={isNavigating ? currentAyah : undefined}
+                    onAyahClick={handleAyahClick}
+                  />
+                );
+              })
+          ) : (
+            /* List View */
+            <ListView
+              verses={chapterVerses?.pages.flatMap((p) => p.verses) || []}
+              currentAyah={isNavigating ? currentAyah : undefined}
+              onAyahClick={handleAyahClick}
+              showTranslation={showTranslation}
+            />
+          )}
         </div>
       </div>
 

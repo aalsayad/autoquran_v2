@@ -11,8 +11,9 @@ const Navbar = ({ bottomNavbar }: { bottomNavbar?: React.ReactNode }) => {
 
   return (
     <>
-      <div className="bg-background text-foreground border-b sticky top-0 z-50">
-        <div className="w-full h-16 max-w-[1150px] mx-auto flex items-center justify-between px-4">
+      <div className="bg-background text-foreground border-b sticky top-0 z-[999]">
+        {/* Main Navbar Top */}
+        <div className="bg-background w-full h-16 max-w-[1150px] mx-auto flex items-center justify-between px-4 relative z-3 ">
           {/* Left side - Logo + Navlinks */}
           <div className="flex items-center gap-8">
             <Link
@@ -57,15 +58,16 @@ const Navbar = ({ bottomNavbar }: { bottomNavbar?: React.ReactNode }) => {
             <UserDropdown />
           </div>
         </div>
-
-        {bottomNavbar}
+        {/* Mobile Menu Sliding Menu */}
+        <div className="relative z-2">
+          <MobileMenu
+            isOpen={mobileMenuOpen}
+            onClose={() => setMobileMenuOpen(false)}
+          />
+        </div>
+        {/* Bottom Navbar Strip */}
+        <div className="relative z-1">{bottomNavbar}</div>
       </div>
-
-      {/* Mobile Menu */}
-      <MobileMenu
-        isOpen={mobileMenuOpen}
-        onClose={() => setMobileMenuOpen(false)}
-      />
     </>
   );
 };
