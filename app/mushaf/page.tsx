@@ -1,28 +1,71 @@
+"use client";
+
 import MushafView from "@/Components/Quran/MushafView";
-import { redirect } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { MushafNavigationBar } from "@/Components/Navbar/MushafNavigationBar";
+import { getChapterData } from "@/lib/quran-helper-functions/quranApi";
+import Navbar from "@/Components/Navbar/Navbar";
 
-type SearchParams = {
-  chapter?: string;
-};
+const MushafPage = () => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const chapter = searchParams.get("chapter");
+  const [chapterNameArabic, setChapterNameArabic] = useState<string>("");
+  const [chapterNameEnglish, setChapterNameEnglish] = useState<string>("");
 
-const MushafPage = async ({
-  searchParams,
-}: {
-  searchParams: Promise<SearchParams>;
-}) => {
-  const params = await searchParams;
+  const currentChapter = parseInt(chapter || "1");
 
   // Redirect to default if no chapter param
-  if (!params.chapter) {
-    redirect("/mushaf?chapter=1");
-  }
+  useEffect(() => {
+    if (!chapter) {
+      router.replace("/mushaf?chapter=1");
+    }
+  }, [chapter, router]);
 
-  const chapterNumber = parseInt(params.chapter);
+  // Fetch chapter names
+  useEffect(() => {
+    const fetchChapterNames = async () => {
+      try {
+        const data = await getChapterData(currentChapter);
+        setChapterNameArabic(data.chapter.name_arabic);
+        setChapterNameEnglish(data.chapter.name_simple);
+      } catch (error) {
+        console.error("Error fetching chapter names:", error);
+      }
+    };
+    fetchChapterNames();
+  }, [currentChapter]);
+
+  const handleNext = () => {
+    if (currentChapter < 114) {
+      router.push(`/mushaf?chapter=${currentChapter + 1}`);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentChapter > 1) {
+      router.push(`/mushaf?chapter=${currentChapter - 1}`);
+    }
+  };
 
   return (
-    <div>
-      <MushafView chapterNumber={chapterNumber} />
-    </div>
+    <>
+      {/* Override navbar with bottom navigation */}
+      <Navbar
+        bottomNavbar={
+          <MushafNavigationBar
+            currentChapter={currentChapter}
+            chapterNameArabic={chapterNameArabic}
+            chapterNameEnglish={chapterNameEnglish}
+            onNext={handleNext}
+            onPrevious={handlePrevious}
+          />
+        }
+      />
+
+      <MushafView chapterNumber={currentChapter} />
+    </>
   );
 };
 
