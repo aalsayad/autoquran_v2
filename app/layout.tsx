@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Scheherazade_New, Noto_Naskh_Arabic } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
+import { ThemeProvider } from "@/Components/ThemeProvider";
 
 const scheherazade = Scheherazade_New({
   weight: ["400", "700"],
@@ -34,11 +35,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="light">
+    <html lang="en" className="light" suppressHydrationWarning>
       <body
         className={`${scheherazade.variable} ${uthmanic.variable} ${notoNaskhArabic.variable} antialiased`}
       >
-        {children}
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

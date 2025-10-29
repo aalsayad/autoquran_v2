@@ -9,11 +9,16 @@ import {
 } from "@/Components/Navbar/MushafNavigationBar";
 import { getChapterData } from "@/lib/quran-helper-functions/quranApi";
 import Navbar from "@/Components/Navbar/Navbar";
+import {
+  toCanonicalFromParams,
+  isCanonicalUrl,
+} from "@/lib/quran-index/resolver";
 
 const MushafPage = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const chapter = searchParams.get("chapter");
+  const ayah = searchParams.get("ayah");
   const [chapterNameArabic, setChapterNameArabic] = useState<string>("");
   const [chapterNameEnglish, setChapterNameEnglish] = useState<string>("");
   const [viewMode, setViewMode] = useState<ViewMode>("page");
@@ -45,12 +50,16 @@ const MushafPage = () => {
     localStorage.setItem("quran-show-translation", showTranslation.toString());
   }, [showTranslation]);
 
-  // Redirect to default if no chapter param
+  // Normalize URL: support ?juz= / ?page= and ensure canonical ?chapter=&ayah=
   useEffect(() => {
-    if (!chapter) {
-      router.replace("/mushaf?chapter=1");
+    const canonical = toCanonicalFromParams(searchParams as any);
+    if (!isCanonicalUrl(searchParams as any, canonical)) {
+      const sp = new URLSearchParams();
+      sp.set("chapter", String(canonical.chapter));
+      sp.set("ayah", String(canonical.ayah));
+      router.replace(`/mushaf?${sp.toString()}`);
     }
-  }, [chapter, router]);
+  }, [searchParams, router]);
 
   // Fetch chapter names
   useEffect(() => {
@@ -101,6 +110,7 @@ const MushafPage = () => {
         chapterNumber={currentChapter}
         viewMode={viewMode}
         showTranslation={showTranslation}
+        initialAyah={ayah ? parseInt(ayah) : undefined}
       />
     </>
   );

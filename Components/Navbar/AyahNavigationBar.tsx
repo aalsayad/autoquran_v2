@@ -2,6 +2,7 @@
 
 import React from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { Button } from "@/Components/ui/button";
 
 interface AyahNavigationBarProps {
   currentAyah: number;
@@ -11,9 +12,6 @@ interface AyahNavigationBarProps {
 }
 
 // Shared class names
-const BASE_STYLES =
-  "border border-border rounded-sm transition-colors hover:bg-accent cursor-pointer";
-const NAV_BUTTON = `flex items-center gap-1 px-3 py-2 text-xs ${BASE_STYLES} disabled:opacity-40 disabled:cursor-not-allowed`;
 
 export function AyahNavigationBar({
   currentAyah,
@@ -26,14 +24,16 @@ export function AyahNavigationBar({
       <div className="max-w-[1150px] mx-auto px-4 py-3 flex items-center justify-center">
         <div className="flex items-center gap-3">
           {/* Previous Ayah Button */}
-          <button
+          <Button
+            variant="outline"
+            size="sm"
             onClick={onPrevious}
             disabled={currentAyah <= 1}
-            className={NAV_BUTTON}
+            className="gap-1 px-3 py-2 h-auto text-xs"
           >
             <FiChevronLeft className="h-3.5 w-3.5" />
             <span>Previous Ayah</span>
-          </button>
+          </Button>
 
           {/* Current Ayah Indicator */}
           <div className="flex items-center gap-2 text-xs font-medium px-4 py-2 border border-border rounded-sm">
@@ -43,14 +43,16 @@ export function AyahNavigationBar({
           </div>
 
           {/* Next Ayah Button */}
-          <button
+          <Button
+            variant="outline"
+            size="sm"
             onClick={onNext}
             disabled={currentAyah >= totalAyahs}
-            className={NAV_BUTTON}
+            className="gap-1 px-3 py-2 h-auto text-xs"
           >
             <span>Next Ayah</span>
             <FiChevronRight className="h-3.5 w-3.5" />
-          </button>
+          </Button>
         </div>
       </div>
     </div>

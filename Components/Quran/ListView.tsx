@@ -9,6 +9,8 @@ type Props = {
   currentAyah?: number;
   onAyahClick?: (ayahNumber: number) => void;
   showTranslation?: boolean;
+  onReady?: () => void;
+  onAyahRef?: (ayahNumber: number) => React.RefCallback<HTMLElement>;
 };
 
 export default function ListView({
@@ -16,9 +18,12 @@ export default function ListView({
   currentAyah,
   onAyahClick,
   showTranslation = false,
+  onReady,
+  onAyahRef,
 }: Props) {
   const [hoveredAyah, setHoveredAyah] = useState<number | null>(null);
   const [fontsLoaded, setFontsLoaded] = useState<Set<number>>(new Set());
+  const [totalPages, setTotalPages] = useState<number>(0);
 
   // Load all unique page fonts
   useEffect(() => {
@@ -29,6 +34,7 @@ export default function ListView({
           uniquePages.add(word.page_number);
         });
       });
+      setTotalPages(uniquePages.size);
 
       const loadedPages = new Set<number>();
       await Promise.all(
@@ -45,6 +51,13 @@ export default function ListView({
 
     loadFonts();
   }, [verses]);
+
+  // Notify parent when fonts are fully loaded (layout stable)
+  useEffect(() => {
+    if (totalPages > 0 && fontsLoaded.size === totalPages) {
+      onReady?.();
+    }
+  }, [fontsLoaded, totalPages, onReady]);
 
   return (
     <div className="space-y-0" lang="ar" dir="rtl">
@@ -67,6 +80,10 @@ export default function ListView({
               onMouseLeave={() => setHoveredAyah(null)}
               onClick={() => onAyahClick?.(verse.verse_number)}
               data-ayah={verse.verse_number}
+              // The whole ayah block is our anchor in list view
+              ref={
+                onAyahRef ? (onAyahRef(verse.verse_number) as any) : undefined
+              }
             >
               {/* Ayah Text with QPC Fonts - Centered with max-width */}
               <div className="w-[95%]">

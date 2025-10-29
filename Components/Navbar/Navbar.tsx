@@ -11,7 +11,7 @@ const Navbar = ({ bottomNavbar }: { bottomNavbar?: React.ReactNode }) => {
 
   return (
     <>
-      <div className="bg-background text-foreground border-b sticky top-0 z-[999]">
+      <div className="bg-background text-foreground border-b sticky top-0 z-999">
         {/* Main Navbar Top */}
         <div className="bg-background w-full h-16 max-w-[1150px] mx-auto flex items-center justify-between px-4 relative z-3 ">
           {/* Left side - Logo + Navlinks */}
@@ -44,7 +44,7 @@ const Navbar = ({ bottomNavbar }: { bottomNavbar?: React.ReactNode }) => {
           <div className="flex items-center gap-2">
             {/* Mobile Menu Toggle */}
             <button
-              className="md:hidden p-2 rounded-md hover:bg-accent transition-colors"
+              className="md:hidden p-2 rounded-md hover:bg-accent transition-colors cursor-pointer"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? (

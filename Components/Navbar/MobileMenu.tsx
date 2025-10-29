@@ -2,6 +2,8 @@
 
 import React from "react";
 import Link from "next/link";
+import { Sheet, SheetContent, SheetTrigger } from "@/Components/ui/sheet";
+import { Separator } from "@/Components/ui/separator";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -12,22 +14,18 @@ interface MobileMenuProps {
 const SECTION_HEADER_CLASSES =
   "text-[9px] uppercase tracking-wider text-muted-foreground/70 font-medium mb-3";
 const MENU_ITEM_BASE =
-  "w-full text-left text-sm py-1.5 rounded-md transition-colors flex items-center";
+  "w-full text-left text-sm py-1.5 rounded-md transition-colors flex items-center cursor-pointer";
 
 export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   return (
-    <>
-      {/* Sliding Menu */}
-      <div
-        className={`fixed bg-background top-16 left-0 right-0 md:hidden transition-transform duration-300 ease-out ${
-          isOpen ? "translate-y-0" : "-translate-y-full"
-        }`}
-      >
-        {/* Mobile Menu Content */}
-        <div className=" border-b">
+    <Sheet open={isOpen} onOpenChange={(o) => (o ? undefined : onClose())}>
+      {/* We control open from parent; no trigger rendered here */}
+      <SheetTrigger className="hidden" />
+      <SheetContent side="top" className="p-0 md:hidden">
+        <div className="border-b">
           <div className="max-w-[1150px] mx-auto px-4 py-6 space-y-10">
             {/* Links Section */}
-            <div className="">
+            <div>
               <p className={SECTION_HEADER_CLASSES}>links</p>
               <div className="flex flex-col gap-2">
                 <Link
@@ -47,8 +45,10 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               </div>
             </div>
 
+            <Separator />
+
             {/* Account Section */}
-            <div className="">
+            <div>
               <p className={SECTION_HEADER_CLASSES}>account</p>
               <div className="flex flex-col gap-2">
                 <Link
@@ -75,14 +75,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             </div>
           </div>
         </div>
-      </div>
-      {/* Backdrop */}
-      {isOpen && (
-        <div
-          className="fixed top-16 bottom-0 left-0 right-0 bg-black/20 z-[-1] md:hidden"
-          onClick={onClose}
-        />
-      )}
-    </>
+      </SheetContent>
+    </Sheet>
   );
 }

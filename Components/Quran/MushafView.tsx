@@ -13,10 +13,12 @@ const MushafView = ({
   chapterNumber,
   viewMode = "page",
   showTranslation = false,
+  initialAyah,
 }: {
   chapterNumber: number;
   viewMode?: ViewMode;
   showTranslation?: boolean;
+  initialAyah?: number;
 }) => {
   const [chapterVerses, setChapterVerses] = useState<ChapterVerses | null>(
     null
@@ -24,6 +26,16 @@ const MushafView = ({
   const [loading, setLoading] = useState(true);
   const [currentAyah, setCurrentAyah] = useState(1);
   const [isNavigating, setIsNavigating] = useState(false);
+  const [listReady, setListReady] = useState(false);
+  // Map of ayah → element (populated via callback-refs). Avoids DOM queries
+  const ayahRefs = React.useRef(new Map<number, HTMLElement>());
+  const getAyahRef = React.useCallback(
+    (n: number) => (el: HTMLElement | null) => {
+      if (el) ayahRefs.current.set(n, el);
+      else ayahRefs.current.delete(n);
+    },
+    []
+  );
 
   useEffect(() => {
     const fetchChapterData = async () => {
@@ -42,23 +54,33 @@ const MushafView = ({
     fetchChapterData();
   }, [chapterNumber]);
 
-  // Scroll to ayah when currentAyah changes (only when navigating)
+  // Initial scroll from URL (does not enable highlighting)
+  useEffect(() => {
+    // Only auto-scroll if there's a specific ayah (> 1). Otherwise, stay at top (surah header visible)
+    if (!loading && initialAyah && initialAyah > 1 && chapterVerses) {
+      if (viewMode === "list" && !listReady) return;
+      setCurrentAyah(initialAyah);
+      setTimeout(() => {
+        const el = ayahRefs.current.get(initialAyah);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          const target = window.scrollY + rect.top - window.innerHeight * 0.2;
+          window.scrollTo({ top: target, behavior: "smooth" });
+        }
+      }, 150);
+    }
+  }, [loading, initialAyah, chapterVerses, viewMode, listReady]);
+
+  // Scroll to ayah when currentAyah changes (only on user navigation)
   useEffect(() => {
     if (currentAyah && isNavigating) {
-      // Use setTimeout to ensure DOM is updated
       setTimeout(() => {
-        const ayahElement = document.querySelector(
-          `[data-ayah="${currentAyah}"]`
-        );
-        if (ayahElement) {
-          const rect = ayahElement.getBoundingClientRect();
+        const el = ayahRefs.current.get(currentAyah);
+        if (el) {
+          const rect = el.getBoundingClientRect();
           const targetPosition =
             window.scrollY + rect.top - window.innerHeight * 0.2;
-
-          window.scrollTo({
-            top: targetPosition,
-            behavior: "smooth",
-          });
+          window.scrollTo({ top: targetPosition, behavior: "smooth" });
         }
       }, 100);
     }
@@ -147,6 +169,8 @@ const MushafView = ({
                     verses={p.verses}
                     currentAyah={isNavigating ? currentAyah : undefined}
                     onAyahClick={handleAyahClick}
+                    // Provide a callback-ref so child can register anchors per ayah
+                    onAyahRef={getAyahRef}
                   />
                 );
               })
@@ -157,6 +181,10 @@ const MushafView = ({
               currentAyah={isNavigating ? currentAyah : undefined}
               onAyahClick={handleAyahClick}
               showTranslation={showTranslation}
+              // Signal when all QPC fonts used by the list are loaded (layout stable)
+              onReady={() => setListReady(true)}
+              // Each ayah block becomes the anchor in list view
+              onAyahRef={getAyahRef}
             />
           )}
         </div>
