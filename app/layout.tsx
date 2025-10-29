@@ -3,6 +3,7 @@ import { Scheherazade_New, Noto_Naskh_Arabic } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "@/Components/ThemeProvider";
+import Navbar from "@/Components/Navbar/Navbar";
 
 const scheherazade = Scheherazade_New({
   weight: ["400", "700"],
@@ -39,7 +40,10 @@ export default function RootLayout({
       <body
         className={`${scheherazade.variable} ${uthmanic.variable} ${notoNaskhArabic.variable} antialiased`}
       >
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <Navbar />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

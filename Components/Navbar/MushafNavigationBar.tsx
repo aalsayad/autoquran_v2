@@ -60,7 +60,7 @@ export function MushafNavigationBar({
   onToggleTranslation,
 }: MushafNavigationBarProps) {
   return (
-    <div className="border-t bg-background relative z-1">
+    <div className="bg-background w-full sticky top-[61px] border-b z-50">
       <div className="max-w-[1150px] mx-auto px-4 py-2.5 flex items-center justify-center relative">
         {/* Navigation buttons centered together */}
         <TooltipProvider>
@@ -79,7 +79,11 @@ export function MushafNavigationBar({
                   <FiChevronLeft className="h-3 w-3" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent className="bg-foreground text-background border-foreground/20">
+              <TooltipContent
+                side="bottom"
+                sideOffset={6}
+                className="bg-foreground text-background border-foreground/20"
+              >
                 Next chapter
               </TooltipContent>
             </Tooltip>
@@ -101,7 +105,11 @@ export function MushafNavigationBar({
                   />
                 </div>
               </TooltipTrigger>
-              <TooltipContent className="bg-foreground text-background border-foreground/20">
+              <TooltipContent
+                side="bottom"
+                sideOffset={6}
+                className="bg-foreground text-background border-foreground/20"
+              >
                 Navigate Quran
               </TooltipContent>
             </Tooltip>
@@ -120,7 +128,11 @@ export function MushafNavigationBar({
                   <FiChevronRight className="h-3 w-3" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent className="bg-foreground text-background border-foreground/20">
+              <TooltipContent
+                side="bottom"
+                sideOffset={6}
+                className="bg-foreground text-background border-foreground/20"
+              >
                 Previous chapter
               </TooltipContent>
             </Tooltip>

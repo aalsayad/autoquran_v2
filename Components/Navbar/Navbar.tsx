@@ -5,70 +5,63 @@ import { FiMenu, FiX } from "react-icons/fi";
 import Link from "next/link";
 import { AuthMenu } from "./AuthMenu";
 import { MobileMenu } from "./MobileMenu";
+import { NAV_LINKS } from "./links";
 
-const Navbar = ({ bottomNavbar }: { bottomNavbar?: React.ReactNode }) => {
+const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <>
-      <div className="bg-background text-foreground border-b sticky top-0 z-999">
-        {/* Main Navbar Top */}
-        <div className="bg-background w-full h-16 max-w-[1150px] mx-auto flex items-center justify-between px-4 relative z-3 ">
-          {/* Left side - Logo + Navlinks */}
-          <div className="flex items-center gap-8">
-            <Link
-              href="/"
-              className="text-lg font-semibold hover:opacity-80 transition-opacity"
-            >
-              AutoQuran
-            </Link>
+    <div className="sticky top-0 w-full text-foreground bg-background border-b z-10000">
+      {/* Main Navbar Top */}
+      <div className="bg-background w-full h-16 mx-auto flex items-center justify-between max-w-[1150px] px-4 relative z-10000">
+        {/* Left side - Logo + Navlinks */}
+        <div className="flex items-center gap-8">
+          <Link
+            href="/"
+            className="text-lg font-semibold hover:opacity-80 transition-opacity"
+          >
+            AutoQuran
+          </Link>
 
-            {/* Desktop Navigation - Hidden on mobile */}
-            <nav className="hidden md:flex items-center gap-1">
+          {/* Desktop Navigation - Hidden on mobile */}
+          <nav className="hidden md:flex items-center gap-1">
+            {NAV_LINKS.map((link) => (
               <Link
-                href="/recitations"
+                key={link.href}
+                href={link.href}
                 className="px-3 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
               >
-                Recitations
+                {link.label}
               </Link>
-              <Link
-                href="/mushaf"
-                className="px-3 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
-              >
-                Mus'haf
-              </Link>
-            </nav>
-          </div>
-
-          {/* Right side */}
-          <div className="flex items-center gap-2">
-            {/* Mobile Menu Toggle */}
-            <button
-              className="md:hidden p-2 rounded-md hover:bg-accent transition-colors cursor-pointer"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? (
-                <FiX className="h-5 w-5" />
-              ) : (
-                <FiMenu className="h-5 w-5" />
-              )}
-            </button>
-
-            {/* Auth: shows Sign in when no user; dropdown when signed in */}
-            <AuthMenu />
-          </div>
+            ))}
+          </nav>
         </div>
-        {/* Mobile Menu Sliding Menu */}
-        <div className="relative z-2">
-          <MobileMenu
-            isOpen={mobileMenuOpen}
-            onClose={() => setMobileMenuOpen(false)}
-          />
+
+        {/* Right side */}
+        <div className="flex items-center gap-2">
+          {/* Auth: shows Sign in when no user; dropdown when signed in */}
+          <AuthMenu />
+          {/* Mobile Menu Toggle */}
+          <button
+            className="md:hidden p-2 rounded-md hover:bg-accent transition-colors cursor-pointer"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? (
+              <FiX className="h-5 w-5" />
+            ) : (
+              <FiMenu className="h-5 w-5" />
+            )}
+          </button>
         </div>
-        {/* Bottom Navbar Strip */}
-        <div className="relative z-1">{bottomNavbar}</div>
       </div>
-    </>
+      {/* Mobile Menu Sliding Menu */}
+      <div className="relative z-9999">
+        <MobileMenu
+          isOpen={mobileMenuOpen}
+          onClose={() => setMobileMenuOpen(false)}
+        />
+      </div>
+    </div>
   );
 };
 

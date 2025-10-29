@@ -20,6 +20,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/Components/ui/dropdown-menu";
+import { ACCOUNT_LINKS } from "./links";
 
 export function UserDropdown({ email }: { email: string }) {
   const { theme, toggleTheme } = useTheme();
@@ -41,21 +42,30 @@ export function UserDropdown({ email }: { email: string }) {
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="end"
-          className="w-64 bg-popover text-popover-foreground shadow-md z-1000"
+          className="w-64"
+          style={{ zIndex: 99999 }}
         >
-          <DropdownMenuLabel>Account</DropdownMenuLabel>
-          <DropdownMenuItem asChild>
-            <Link href="/profile" className="flex items-center gap-2">
-              <FiUser className="h-3.5 w-3.5" />
-              <span>Profile</span>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/settings" className="flex items-center gap-2">
-              <FiSettings className="h-3.5 w-3.5" />
-              <span>Settings</span>
-            </Link>
-          </DropdownMenuItem>
+          {ACCOUNT_LINKS.length > 0 && (
+            <>
+              {ACCOUNT_LINKS.map((l) => (
+                <DropdownMenuItem
+                  key={l.href}
+                  asChild
+                  className="flex items-center gap-2"
+                >
+                  <Link href={l.href} className="flex items-center gap-2">
+                    {l.label === "Profile" ? (
+                      <FiUser className="h-3.5 w-3.5" />
+                    ) : (
+                      <FiSettings className="h-3.5 w-3.5" />
+                    )}
+                    <span>{l.label}</span>
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+            </>
+          )}
           <DropdownMenuItem
             onSelect={() => toggleTheme()}
             className="flex items-center gap-2"
@@ -65,7 +75,7 @@ export function UserDropdown({ email }: { email: string }) {
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            className="flex items-center gap-2 text-destructive focus:text-destructive"
+            className="flex items-center gap-2 focus:text-destructive"
             asChild
           >
             <button
@@ -79,7 +89,7 @@ export function UserDropdown({ email }: { email: string }) {
                 window.location.replace("/login");
               }}
             >
-              <FiLogOut className="h-3.5 w-3.5" />
+              <FiLogOut className="h-3.5 w-3.5 focus:text-destructive" />
               <span>Log out</span>
             </button>
           </DropdownMenuItem>

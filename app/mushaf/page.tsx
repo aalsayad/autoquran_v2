@@ -89,23 +89,17 @@ const MushafPage = () => {
 
   return (
     <>
-      {/* Override navbar with bottom navigation */}
-      <Navbar
-        bottomNavbar={
-          <MushafNavigationBar
-            currentChapter={currentChapter}
-            chapterNameArabic={chapterNameArabic}
-            chapterNameEnglish={chapterNameEnglish}
-            viewMode={viewMode}
-            showTranslation={showTranslation}
-            onNext={handleNext}
-            onPrevious={handlePrevious}
-            onViewChange={setViewMode}
-            onToggleTranslation={() => setShowTranslation(!showTranslation)}
-          />
-        }
+      <MushafNavigationBar
+        currentChapter={currentChapter}
+        chapterNameArabic={chapterNameArabic}
+        chapterNameEnglish={chapterNameEnglish}
+        viewMode={viewMode}
+        showTranslation={showTranslation}
+        onNext={handleNext}
+        onPrevious={handlePrevious}
+        onViewChange={setViewMode}
+        onToggleTranslation={() => setShowTranslation(!showTranslation)}
       />
-
       <MushafView
         chapterNumber={currentChapter}
         viewMode={viewMode}
