@@ -1,12 +1,5 @@
-import Navbar from "@/Components/Navbar/Navbar";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return (
-    <>
-      <Navbar />
-      <div className="min-h-screen flex items-center justify-center">
-        <h1 className="text-2xl font-semibold">Welcome to AutoQuran</h1>
-      </div>
-    </>
-  );
+  redirect("/mushaf");
 }

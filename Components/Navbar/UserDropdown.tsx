@@ -21,7 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "@/Components/ui/dropdown-menu";
 
-export function UserDropdown() {
+export function UserDropdown({ email }: { email: string }) {
   const { theme, toggleTheme } = useTheme();
 
   const nextTheme = theme === "dark" ? "light" : "dark";
@@ -35,7 +35,7 @@ export function UserDropdown() {
             variant="outline"
             className="group w-full justify-between gap-2 px-3 py-2 text-sm font-normal"
           >
-            <span className="truncate">ahmednalsayad@gmail.com</span>
+            <span className="truncate">{email}</span>
             <FiChevronDown className="h-3.5 w-3.5 opacity-50 transition-transform duration-150 group-data-[open=true]:rotate-180" />
           </Button>
         </DropdownMenuTrigger>
@@ -64,9 +64,24 @@ export function UserDropdown() {
             <span>{nextTheme === "dark" ? "Dark Mode" : "Light Mode"}</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="flex items-center gap-2 text-destructive focus:text-destructive">
-            <FiLogOut className="h-3.5 w-3.5" />
-            <span>Log out</span>
+          <DropdownMenuItem
+            className="flex items-center gap-2 text-destructive focus:text-destructive"
+            asChild
+          >
+            <button
+              className="flex items-center gap-2 w-full text-left"
+              onClick={async () => {
+                const { createClient } = await import(
+                  "@/utils/supabase/client"
+                );
+                const supabase = createClient();
+                await supabase.auth.signOut();
+                window.location.replace("/login");
+              }}
+            >
+              <FiLogOut className="h-3.5 w-3.5" />
+              <span>Log out</span>
+            </button>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

@@ -85,17 +85,26 @@ export function MushafNavigationBar({
             </Tooltip>
 
             {/* Center - Chapter Info doubles as Navigate dialog trigger */}
-            <NavigateDialog
-              trigger={
-                <button type="button" className={CHAPTER_INFO}>
-                  <span>
-                    {chapterNameArabic || `Chapter ${currentChapter}`}
-                  </span>
-                  <span className={MUTED_TEXT}>•</span>
-                  <span className={MUTED_TEXT}>{chapterNameEnglish}</span>
-                </button>
-              }
-            />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <NavigateDialog
+                    trigger={
+                      <button type="button" className={CHAPTER_INFO}>
+                        <span>
+                          {chapterNameArabic || `Chapter ${currentChapter}`}
+                        </span>
+                        <span className={MUTED_TEXT}>•</span>
+                        <span className={MUTED_TEXT}>{chapterNameEnglish}</span>
+                      </button>
+                    }
+                  />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent className="bg-foreground text-background border-foreground/20">
+                Navigate Quran
+              </TooltipContent>
+            </Tooltip>
 
             {/* Previous Button */}
             <Tooltip>

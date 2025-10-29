@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { FiMenu, FiX } from "react-icons/fi";
 import Link from "next/link";
-import { UserDropdown } from "./UserDropdown";
+import { AuthMenu } from "./AuthMenu";
 import { MobileMenu } from "./MobileMenu";
 
 const Navbar = ({ bottomNavbar }: { bottomNavbar?: React.ReactNode }) => {
@@ -54,8 +54,8 @@ const Navbar = ({ bottomNavbar }: { bottomNavbar?: React.ReactNode }) => {
               )}
             </button>
 
-            {/* Desktop User Dropdown */}
-            <UserDropdown />
+            {/* Auth: shows Sign in when no user; dropdown when signed in */}
+            <AuthMenu />
           </div>
         </div>
         {/* Mobile Menu Sliding Menu */}

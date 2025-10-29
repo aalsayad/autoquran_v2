@@ -23,31 +23,19 @@ export default function QpcPage({
   onAyahClick,
   onAyahRef,
 }: Props) {
+  // Runtime page-specific font family (QPC font per page)
   const [fontLoaded, setFontLoaded] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
   const [hoveredAyah, setHoveredAyah] = React.useState<number | null>(null);
   const family = `QPC-Page-${pageNumber}`;
 
-  console.log(`[QpcPage ${pageNumber}] Verses:`, verses);
-  console.log(
-    `[QpcPage ${pageNumber}] Total words:`,
-    verses.reduce((acc, v) => acc + v.words.length, 0)
-  );
-
+  // Words are pre-grouped into visual lines for this page
   const grouped = groupWordsIntoPageLines(verses);
-  console.log(
-    `[QpcPage ${pageNumber}] Grouped lines:`,
-    Object.keys(grouped).length
-  );
-  console.log(
-    `[QpcPage ${pageNumber}] Words after grouping:`,
-    Object.values(grouped).flat().length
-  );
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      console.log(`[QpcPage] Loading page ${pageNumber}...`);
+      // Ensure the page font is available before rendering to avoid layout shift
       const loaded = await ensureQpcFont(pageNumber);
 
       if (!loaded) {
@@ -76,7 +64,7 @@ export default function QpcPage({
     );
   }
 
-  // Create a map of word IDs to verse numbers for highlighting
+  // Map each word id → verse number to drive per-ayah opacity/hover highlighting
   const wordToVerseMap = new Map<number, number>();
   verses.forEach((verse) => {
     verse.words.forEach((word) => {
@@ -89,6 +77,7 @@ export default function QpcPage({
       <div className="">
         {sortedLineEntries(grouped).map(([lineNum, words]) => {
           // Track the first word per ayah on this line so we attach only one ref
+          // Rationale: multiple words share the same ayah; we want a stable scroll anchor
           const seenVerses = new Set<number>();
           return (
             <div
@@ -97,7 +86,7 @@ export default function QpcPage({
               style={{ fontFamily: fontLoaded ? family : "serif" }}
             >
               {(words as Word[]).map((word) => {
-                // Use code_v1 glyph from API, fallback to text_uthmani
+                // Render the QPC glyph; fallback to Uthmani text where unavailable
                 const glyph = word.code_v1 || word.text_uthmani;
                 const verseNumber = wordToVerseMap.get(word.id);
                 const isCurrentAyah =
@@ -110,6 +99,7 @@ export default function QpcPage({
                     ? "opacity-100"
                     : "opacity-30";
 
+                // Attach a ref only to the first word for this ayah on this line
                 const needRef = verseNumber && !seenVerses.has(verseNumber);
                 if (needRef && verseNumber) seenVerses.add(verseNumber);
                 return (
@@ -120,6 +110,7 @@ export default function QpcPage({
                     onMouseEnter={() => setHoveredAyah(verseNumber || null)}
                     onMouseLeave={() => setHoveredAyah(null)}
                     onClick={() => verseNumber && onAyahClick?.(verseNumber)}
+                    // Callback-ref registers anchors upstream for scrolling
                     ref={
                       needRef && onAyahRef
                         ? (onAyahRef(verseNumber!) as any)
