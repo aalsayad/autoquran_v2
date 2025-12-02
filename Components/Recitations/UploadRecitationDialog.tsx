@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/Components/ui/button";
 import {
   Dialog,
@@ -14,29 +15,22 @@ import {
 import { FiChevronDown } from "react-icons/fi";
 import { chapters } from "@/lib/quran-index/chapters";
 import { AddRecitorDialog } from "./AddRecitorDialog";
-import { Separator } from "@radix-ui/react-separator";
+import { Separator } from "@/Components/ui/separator";
+import {
+  getRecitors,
+  saveRecitor,
+  saveRecitation,
+  type Recitor,
+} from "@/lib/storage/recitations";
 
 type UploadRecitationDialogProps = {
   trigger?: React.ReactNode;
-  onUpload?: (payload: {
-    file: File;
-    surahId: number;
-    recitorId: string;
-    title?: string;
-  }) => void;
 };
-
-// Mock recitors - replace with actual data from your DB
-const MOCK_RECITORS = [
-  { id: "1", name: "Mishary Rashid Alafasy" },
-  { id: "2", name: "Abdul Basit" },
-  { id: "3", name: "Saad Al-Ghamdi" },
-];
 
 export function UploadRecitationDialog({
   trigger,
-  onUpload,
 }: UploadRecitationDialogProps) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [surah, setSurah] = useState<number>(1);
@@ -44,13 +38,20 @@ export function UploadRecitationDialog({
   const [surahSearch, setSurahSearch] = useState("");
   const [recitor, setRecitor] = useState<string>("");
   const [recitorOpen, setRecitorOpen] = useState(false);
-  const [recitors, setRecitors] = useState(MOCK_RECITORS);
+  const [recitors, setRecitors] = useState<Recitor[]>([]);
   const [title, setTitle] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Load recitors from localStorage on mount
+  useEffect(() => {
+    setRecitors(getRecitors());
+  }, []);
+
   function handleAddRecitor(name: string, id: string) {
-    setRecitors((prev) => [...prev, { id, name }]);
+    const newRecitor = { id, name };
+    saveRecitor(newRecitor);
+    setRecitors((prev) => [...prev, newRecitor]);
     setRecitor(id);
   }
 
@@ -66,9 +67,52 @@ export function UploadRecitationDialog({
     }
     setLoading(true);
     try {
-      // TODO: Implement actual upload logic
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      onUpload?.({ file, surahId: surah, recitorId: recitor, title });
+      // Step 1: Get presigned URL from our API
+      const urlResponse = await fetch("/api/upload-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fileName: file.name,
+          fileType: file.type,
+        }),
+      });
+
+      if (!urlResponse.ok) {
+        throw new Error("Failed to get upload URL");
+      }
+
+      const { signedUrl, publicUrl } = await urlResponse.json();
+
+      // Step 2: Upload file directly to S3
+      const uploadResponse = await fetch(signedUrl, {
+        method: "PUT",
+        body: file,
+        headers: {
+          "Content-Type": file.type,
+        },
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error("Failed to upload file to S3");
+      }
+
+      const selectedRecitor = recitors.find((r) => r.id === recitor);
+      const selectedSurah = chapters.find((c) => c.id === surah);
+
+      // Step 3: Save recitation to localStorage
+      const recitationId = `recitation-${Date.now()}`;
+      const recitation = {
+        id: recitationId,
+        title: title || undefined,
+        surahId: surah,
+        surahName: selectedSurah?.name_simple || "",
+        recitorId: recitor,
+        recitorName: selectedRecitor?.name || "",
+        audioUrl: publicUrl,
+        uploadedAt: new Date().toISOString(),
+      };
+
+      saveRecitation(recitation);
 
       // Reset form
       setFile(null);
@@ -76,6 +120,9 @@ export function UploadRecitationDialog({
       setRecitor("");
       setTitle("");
       setOpen(false);
+
+      // Navigate to the recitation detail page
+      router.push(`/recitations/${recitationId}`);
     } catch (e: any) {
       setError(e?.message || "Upload failed.");
     } finally {
